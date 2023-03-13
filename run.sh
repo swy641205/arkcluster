@@ -93,7 +93,11 @@ fi
 
 log "###########################################################################"
 log "Installing Mods ..."
-arkmanager installmods
+arkmanager checkmodupdate
+if [ $? -eq 0 ];
+then
+    arkmanager installmods
+fi
 
 log "###########################################################################"
 log "Launching ark server ..."
