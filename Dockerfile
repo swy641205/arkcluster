@@ -10,28 +10,25 @@ LABEL org.opencontainers.image.authors="Richard Kuhnt <r15ch13+git@gmail.com>" \
 # Use baseimage-docker's init system.
 CMD ["/sbin/my_init"]
 
+RUN <<EOT bash
 # Install dependencies and clean up
-RUN apt-get update \
-    && apt-get upgrade -y -o Dpkg::Options::="--force-confold" \
-    && apt-get install -y --no-install-recommends \
+    apt-get update
+    apt-get upgrade -y -o Dpkg::Options::="--force-confold"
+    apt-get install -y --no-install-recommends \
         bzip2 \
         curl \
         lib32gcc1 \
         libc6-i386 \
         lsof \
         perl-modules \
-        tzdata \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+        tzdata
+    apt-get clean
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Create required directories
-RUN mkdir -p /ark \
-    mkdir -p /ark/log \
-    mkdir -p /ark/backup \
-    mkdir -p /ark/staging \
-    mkdir -p /ark/steam \
-    mkdir -p /ark/default \
+    mkdir -p /ark/{log,backup,staging,steam,default}
     mkdir -p /cluster
+EOT
 
 ARG ARKMANAGER_VERSION=1.6.62
 
@@ -64,21 +61,23 @@ ENV CRON_AUTO_UPDATE="0 */3 * * *" \
     KILL_PROCESS_TIMEOUT=300 \
     KILL_ALL_PROCESSES_TIMEOUT=300
 
+RUN <<EOT bash
 # Add steam user
-RUN addgroup --gid "$GROUP_ID" steam \
-    && adduser --system --uid "$USER_ID" --gid "$GROUP_ID" --shell /bin/bash steam \
-    && usermod -a -G docker_env steam
+    addgroup --gid "$GROUP_ID" steam
+    adduser --system --uid "$USER_ID" --gid "$GROUP_ID" --shell /bin/bash steam
+    usermod -a -G docker_env steam
 
 # Install ark-server-tools
-RUN curl -sqL "https://github.com/arkmanager/ark-server-tools/archive/refs/tags/v${ARKMANAGER_VERSION}.tar.gz" | tar zxvf - \
-    && mv "./ark-server-tools-${ARKMANAGER_VERSION}" /home/steam/ark-server-tools \
-    && cd /home/steam/ark-server-tools/tools/ \
-    && ./install.sh steam --bindir=/usr/bin
+    curl -sqL "https://github.com/arkmanager/ark-server-tools/archive/refs/tags/v${ARKMANAGER_VERSION}.tar.gz" | tar zxvf -
+    mv "./ark-server-tools-${ARKMANAGER_VERSION}" /home/steam/ark-server-tools
+    cd /home/steam/ark-server-tools/tools/
+    ./install.sh steam --bindir=/usr/bin
 
 # Install steamcmd
-RUN mkdir -p /home/steam/steamcmd \
-    && cd /home/steam/steamcmd \
-    && curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf -
+    mkdir -p /home/steam/steamcmd
+    cd /home/steam/steamcmd
+    curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf -
+EOT
 
 # Setup arkcluster
 RUN mkdir -p /etc/service/arkcluster
