@@ -20,7 +20,7 @@ export TERM=linux
 function stop {
     if [ "${BACKUPONSTOP}" -eq 1 ] && [ "$(ls -A /ark/server/ShooterGame/Saved/SavedArks)" ]; then
         log "Creating Backup ..."
-        arkmanager backup
+        arkmanager backup --cluster
     fi
     if [ "${WARNONSTOP}" -eq 1 ]; then
         arkmanager stop --warn
@@ -61,7 +61,7 @@ fi
 
 if [ ! -f /etc/cron.d/arkbackup ]; then
     log "Adding backup cronjob (${CRON_AUTO_BACKUP}) ..."
-    echo "$CRON_AUTO_BACKUP steam bash -l -c 'arkmanager backup >> /ark/log/ark-backup.log 2>&1'" > /etc/cron.d/arkbackup
+    echo "$CRON_AUTO_BACKUP steam bash -l -c 'arkmanager backup --cluster >> /ark/log/ark-backup.log 2>&1'" > /etc/cron.d/arkbackup
 fi
 
 # We overwrite the default file each time
@@ -89,7 +89,7 @@ if [ ! -d /ark/server ] || [ ! -f /ark/server/version.txt ]; then
 else
     if [ "${BACKUPONSTART}" -eq 1 ] && [ "$(ls -A /ark/server/ShooterGame/Saved/SavedArks/)" ]; then
         log "Creating Backup ..."
-        arkmanager backup
+        arkmanager backup --cluster
     fi
 fi
 
