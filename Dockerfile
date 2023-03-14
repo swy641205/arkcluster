@@ -30,6 +30,7 @@ RUN mkdir -p /ark \
     mkdir -p /ark/log \
     mkdir -p /ark/backup \
     mkdir -p /ark/staging \
+    mkdir -p /ark/steam \
     mkdir -p /ark/default \
     mkdir -p /cluster
 
