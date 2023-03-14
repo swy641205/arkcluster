@@ -50,6 +50,8 @@ services:
       SPECTATOR_PASSWORD: "keepmesecret"
       MODS: "731604991"
       CLUSTER_ID: "keepmesecret"
+      GAME_USERSETTINGS_INI_PATH: ""
+      GAME_INI_PATH: ""
       KILL_PROCESS_TIMEOUT: 300
       KILL_ALL_PROCESSES_TIMEOUT: 300
     volumes:
@@ -89,6 +91,8 @@ services:
       SPECTATOR_PASSWORD: "keepmesecret"
       MODS: "731604991"
       CLUSTER_ID: "keepmesecret"
+      GAME_USERSETTINGS_INI_PATH: ""
+      GAME_INI_PATH: ""
       KILL_PROCESS_TIMEOUT: 300
       KILL_ALL_PROCESSES_TIMEOUT: 300
     volumes:
