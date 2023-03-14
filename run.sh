@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
+
+# shellcheck source=/dev/null
 source /etc/container_environment.sh
 
-function log { echo "`date +\"%Y-%m-%dT%H:%M:%SZ\"`: $@"; }
+function log { echo "$(date +%Y-%m-%dT%H:%M:%SZ): $*"; }
 
 log "###########################################################################"
-log "# Started  - `date`"
+log "# Started  - $(date)"
 log "# Server   - ${SESSION_NAME}"
 log "# Cluster  - ${CLUSTER_ID}"
 log "# User     - ${USER_ID}"
@@ -16,11 +18,11 @@ mkfifo /tmp/FIFO
 export TERM=linux
 
 function stop {
-    if [ ${BACKUPONSTOP} -eq 1 ] && [ "$(ls -A /ark/server/ShooterGame/Saved/SavedArks)" ]; then
+    if [ "${BACKUPONSTOP}" -eq 1 ] && [ "$(ls -A /ark/server/ShooterGame/Saved/SavedArks)" ]; then
         log "Creating Backup ..."
         arkmanager backup
     fi
-    if [ ${WARNONSTOP} -eq 1 ]; then
+    if [ "${WARNONSTOP}" -eq 1 ]; then
         arkmanager stop --warn
     else
         arkmanager stop
@@ -31,21 +33,21 @@ function stop {
 # Change the USER_ID if needed
 if [ ! "$(id -u steam)" -eq "$USER_ID" ]; then
     log "Changing steam uid to $USER_ID."
-    usermod -o -u "$USER_ID" steam ;
+    usermod -o -u "$USER_ID" steam
 fi
 # Change gid if needed
 if [ ! "$(id -g steam)" -eq "$GROUP_ID" ]; then
     log "Changing steam gid to $GROUP_ID."
-    groupmod -o -g "$GROUP_ID" steam ;
+    groupmod -o -g "$GROUP_ID" steam
 fi
 
 [ ! -d /ark/log ] && mkdir /ark/log
 [ ! -d /ark/backup ] && mkdir /ark/backup
 [ ! -d /ark/staging ] && mkdir /ark/staging
 
-if [ -f /usr/share/zoneinfo/${TZ} ]; then
+if [ -f "/usr/share/zoneinfo/${TZ}" ]; then
     log "Setting timezone to ${TZ} ..."
-    ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime
+    ln -sf "/usr/share/zoneinfo/${TZ}" /etc/localtime
 fi
 
 if [ ! -f /etc/cron.d/upgradetools ]; then
@@ -76,7 +78,7 @@ fi
 chown -R steam:steam /ark /home/steam /cluster
 log "###########################################################################"
 
-if [ ! -d /ark/server  ] || [ ! -f /ark/server/version.txt ]; then
+if [ ! -d /ark/server ] || [ ! -f /ark/server/version.txt ]; then
     log "No game files found. Installing..."
     mkdir -p /ark/server/ShooterGame/Saved/SavedArks
     mkdir -p /ark/server/ShooterGame/Content/Mods
@@ -85,7 +87,7 @@ if [ ! -d /ark/server  ] || [ ! -f /ark/server/version.txt ]; then
     chown -R steam:steam /ark/server
     arkmanager install --dots
 else
-    if [ ${BACKUPONSTART} -eq 1 ] && [ "$(ls -A /ark/server/ShooterGame/Saved/SavedArks/)" ]; then
+    if [ "${BACKUPONSTART}" -eq 1 ] && [ "$(ls -A /ark/server/ShooterGame/Saved/SavedArks/)" ]; then
         log "Creating Backup ..."
         arkmanager backup
     fi
@@ -93,15 +95,13 @@ fi
 
 log "###########################################################################"
 log "Installing Mods ..."
-arkmanager checkmodupdate
-if [ $? -eq 0 ];
-then
+if ! arkmanager checkmodupdate --revstatus; then
     arkmanager installmods --dots
 fi
 
 log "###########################################################################"
 log "Launching ark server ..."
-if [ ${UPDATEONSTART} -eq 1 ]; then
+if [ "${UPDATEONSTART}" -eq 1 ]; then
     arkmanager start
 else
     arkmanager start -noautoupdate
@@ -113,5 +113,5 @@ log "Running ... (waiting for INT/TERM signal)"
 trap stop INT
 trap stop TERM
 
-read < /tmp/FIFO &
+read -r < /tmp/FIFO &
 wait
