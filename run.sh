@@ -50,10 +50,6 @@ if [ -f "/usr/share/zoneinfo/${TZ}" ]; then
     ln -sf "/usr/share/zoneinfo/${TZ}" /etc/localtime
 fi
 
-if [ ! -f /etc/cron.d/upgradetools ]; then
-    echo "0 2 * * Mon root bash -l -c 'yes | arkmanager upgrade-tools >> /ark/log/arkmanager-upgrade.log 2>&1'" > /etc/cron.d/upgradetools
-fi
-
 if [ ! -f /etc/cron.d/arkupdate ]; then
     log "Adding update cronjob (${CRON_AUTO_UPDATE}) ..."
     echo "$CRON_AUTO_UPDATE steam bash -l -c 'arkmanager update --dots --update-mods --warn --ifempty --saveworld --backup >> /ark/log/ark-update.log 2>&1'" > /etc/cron.d/arkupdate

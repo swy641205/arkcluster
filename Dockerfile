@@ -16,7 +16,6 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         bzip2 \
         curl \
-        git \
         lib32gcc1 \
         libc6-i386 \
         lsof \
@@ -33,6 +32,8 @@ RUN mkdir -p /ark \
     mkdir -p /ark/steam \
     mkdir -p /ark/default \
     mkdir -p /cluster
+
+ARG ARKMANAGER_VERSION=1.6.62
 
 # Expose environment variables
 ENV CRON_AUTO_UPDATE="0 */3 * * *" \
@@ -64,12 +65,13 @@ ENV CRON_AUTO_UPDATE="0 */3 * * *" \
     KILL_ALL_PROCESSES_TIMEOUT=300
 
 # Add steam user
-RUN addgroup --gid $GROUP_ID steam \
-    && adduser --system --uid $USER_ID --gid $GROUP_ID --shell /bin/bash steam \
+RUN addgroup --gid "$GROUP_ID" steam \
+    && adduser --system --uid "$USER_ID" --gid "$GROUP_ID" --shell /bin/bash steam \
     && usermod -a -G docker_env steam
 
 # Install ark-server-tools
-RUN git clone --single-branch --depth 1 https://github.com/arkmanager/ark-server-tools.git /home/steam/ark-server-tools \
+RUN curl -sqL "https://github.com/arkmanager/ark-server-tools/archive/refs/tags/v${ARKMANAGER_VERSION}.tar.gz" | tar zxvf - \
+    && mv "./ark-server-tools-${ARKMANAGER_VERSION}" /home/steam/ark-server-tools \
     && cd /home/steam/ark-server-tools/tools/ \
     && ./install.sh steam --bindir=/usr/bin
 
