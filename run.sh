@@ -54,7 +54,7 @@ fi
 
 if [ ! -f /etc/cron.d/arkupdate ]; then
     log "Adding update cronjob (${CRON_AUTO_UPDATE}) ..."
-    echo "$CRON_AUTO_UPDATE steam bash -l -c 'arkmanager update --update-mods --warn --ifempty --saveworld --backup >> /ark/log/ark-update.log 2>&1'" > /etc/cron.d/arkupdate
+    echo "$CRON_AUTO_UPDATE steam bash -l -c 'arkmanager update --dots --update-mods --warn --ifempty --saveworld --backup >> /ark/log/ark-update.log 2>&1'" > /etc/cron.d/arkupdate
 fi
 
 if [ ! -f /etc/cron.d/arkbackup ]; then
@@ -83,7 +83,7 @@ if [ ! -d /ark/server  ] || [ ! -f /ark/server/version.txt ]; then
     mkdir -p /ark/server/ShooterGame/Binaries/Linux
     touch /ark/server/ShooterGame/Binaries/Linux/ShooterGameServer
     chown -R steam:steam /ark/server
-    arkmanager install
+    arkmanager install --dots
 else
     if [ ${BACKUPONSTART} -eq 1 ] && [ "$(ls -A /ark/server/ShooterGame/Saved/SavedArks/)" ]; then
         log "Creating Backup ..."
@@ -96,7 +96,7 @@ log "Installing Mods ..."
 arkmanager checkmodupdate
 if [ $? -eq 0 ];
 then
-    arkmanager installmods
+    arkmanager installmods --dots
 fi
 
 log "###########################################################################"
