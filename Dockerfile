@@ -1,5 +1,6 @@
+# syntax=docker/dockerfile:1
+FROM phusion/baseimage:jammy-1.0.1
 # https://github.com/phusion/baseimage-docker
-FROM phusion/baseimage:latest-amd64
 
 LABEL org.opencontainers.image.authors="Richard Kuhnt <r15ch13+git@gmail.com>" \
       org.opencontainers.image.title="ARK Cluster Image" \
