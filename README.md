@@ -44,6 +44,7 @@ services:
       RCON_PORT: 32330
       GAME_PORT: 7777
       QUERY_PORT: 27015
+      SERVER_PVE: "False"
       SERVER_PASSWORD: ""
       ADMIN_PASSWORD: "keepmesecret"
       SPECTATOR_PASSWORD: "keepmesecret"
@@ -82,6 +83,7 @@ services:
       RCON_PORT: 32331
       GAME_PORT: 7779
       QUERY_PORT: 27016
+      SERVER_PVE: "False"
       SERVER_PASSWORD: ""
       ADMIN_PASSWORD: "keepmesecret"
       SPECTATOR_PASSWORD: "keepmesecret"
