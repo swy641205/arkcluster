@@ -15,14 +15,7 @@ RUN <<EOT bash
 # Install dependencies and clean up
     apt-get update
     apt-get upgrade -y -o Dpkg::Options::="--force-confold"
-    apt-get install -y --no-install-recommends \
-        bzip2 \
-        curl \
-        lib32gcc1 \
-        libc6-i386 \
-        lsof \
-        perl-modules \
-        tzdata
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends bzip2 curl lib32gcc-s1 libc6-i386 lsof perl-modules tzdata
     apt-get clean
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
