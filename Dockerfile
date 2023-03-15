@@ -79,11 +79,13 @@ COPY run.sh /etc/service/arkcluster/run
 RUN chmod +x /etc/service/arkcluster/run
 
 COPY crontab /home/steam/crontab
+COPY healthcheck.sh /bin/healthcheck
+RUN chmod +x /bin/healthcheck
 
 COPY arkmanager.cfg /etc/arkmanager/arkmanager.cfg
 COPY arkmanager-user.cfg /home/steam/arkmanager-user.cfg
 
-HEALTHCHECK --interval=1m --timeout=10s --start-period=5m --retries=10 CMD [ "cat /proc/net/udp | grep `printf '%X' $GAME_PORT` || exit 1" ]
+HEALTHCHECK --interval=10s --timeout=10s --start-period=10s --retries=3 CMD [ healthcheck ]
 
 VOLUME /ark /cluster
 WORKDIR /ark

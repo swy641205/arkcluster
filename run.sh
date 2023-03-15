@@ -15,9 +15,14 @@ log "###########################################################################
 [ -p /tmp/FIFO ] && rm /tmp/FIFO
 mkfifo /tmp/FIFO
 
+rm -f /ark/server/.stopping-server
+rm -f /ark/server/.installing-ark
+rm -f /ark/server/.installing-mods
+
 export TERM=linux
 
 function stop {
+    touch /ark/server/.stopping-server
     if [ "${BACKUPONSTOP}" -eq 1 ] && [ "$(ls -A /ark/server/ShooterGame/Saved/SavedArks)" ]; then
         log "Creating Backup ..."
         arkmanager backup --cluster
@@ -27,6 +32,7 @@ function stop {
     else
         arkmanager stop
     fi
+    rm -f /ark/server/.stopping-server
     exit
 }
 
@@ -81,7 +87,9 @@ if [ ! -d /ark/server ] || [ ! -f /ark/server/version.txt ]; then
     mkdir -p /ark/server/ShooterGame/Binaries/Linux
     touch /ark/server/ShooterGame/Binaries/Linux/ShooterGameServer
     chown -R steam:steam /ark/server
+    touch /ark/server/.installing-ark
     arkmanager install --dots
+    rm -f /ark/server/.installing-ark
 else
     if [ "${BACKUPONSTART}" -eq 1 ] && [ "$(ls -A /ark/server/ShooterGame/Saved/SavedArks/)" ]; then
         log "Creating Backup ..."
@@ -92,7 +100,9 @@ fi
 log "###########################################################################"
 log "Installing Mods ..."
 if ! arkmanager checkmodupdate --revstatus; then
+    touch /ark/server/.installing-mods
     arkmanager installmods --dots
+    rm -f /ark/server/.installing-mods
 fi
 
 log "###########################################################################"
