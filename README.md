@@ -41,27 +41,24 @@ services:
       SESSION_NAME: "ARK Cluster TheIsland"
       MAX_PLAYERS: 15
       RCON_ENABLE: "True"
-      RCON_PORT: 32330
-      GAME_PORT: 7777
-      QUERY_PORT: 27015
+      QUERY_PORT: 15000
+      GAME_PORT: 15002
+      RCON_PORT: 15003
       SERVER_PVE: "False"
       SERVER_PASSWORD: ""
       ADMIN_PASSWORD: "keepmesecret"
       SPECTATOR_PASSWORD: "keepmesecret"
       MODS: "731604991"
-      CLUSTER_ID: "keepmesecret"
-      GAME_USERSETTINGS_INI_PATH: ""
-      GAME_INI_PATH: ""
+      CLUSTER_ID: "myclusterid"
+      GAME_USERSETTINGS_INI_PATH: "/cluster/myclusterid.GameUserSettings.ini"
+      GAME_INI_PATH: "/cluster/myclusterid.Game.ini"
       KILL_PROCESS_TIMEOUT: 300
       KILL_ALL_PROCESSES_TIMEOUT: 300
     volumes:
       - server_island:/ark
       - cluster:/cluster
     ports:
-      - "32330:32330/tcp"
-      - "7777:7777/udp"
-      - "7778:7778/udp"
-      - "27015:27015/udp"
+      - "15000-15003:15000-15003/udp"
 
   island:
     image: r15ch13/arkcluster:latest
@@ -82,27 +79,24 @@ services:
       SESSION_NAME: "ARK Cluster Valguero"
       MAX_PLAYERS: 15
       RCON_ENABLE: "False"
-      RCON_PORT: 32331
-      GAME_PORT: 7779
-      QUERY_PORT: 27016
+      QUERY_PORT: 15010
+      GAME_PORT: 15012
+      RCON_PORT: 15013
       SERVER_PVE: "False"
       SERVER_PASSWORD: ""
       ADMIN_PASSWORD: "keepmesecret"
       SPECTATOR_PASSWORD: "keepmesecret"
       MODS: "731604991"
-      CLUSTER_ID: "keepmesecret"
-      GAME_USERSETTINGS_INI_PATH: ""
-      GAME_INI_PATH: ""
+      CLUSTER_ID: "myclusterid"
+      GAME_USERSETTINGS_INI_PATH: "/cluster/myclusterid.GameUserSettings.ini"
+      GAME_INI_PATH: "/cluster/myclusterid.Game.ini"
       KILL_PROCESS_TIMEOUT: 300
       KILL_ALL_PROCESSES_TIMEOUT: 300
     volumes:
       - server_valguero:/ark
       - cluster:/cluster
     ports:
-      - "32331:32331/tcp"
-      - "7779:7779/udp"
-      - "7780:7780/udp"
-      - "27016:27016/udp"
+      - "15010-15013:15010-15013/udp"
 
 volumes:
   server_island:
@@ -124,6 +118,8 @@ volumes:
     + /ark/template/crontab : default config file for crontab
     + /ark/staging : default directory if you use the --downloadonly option when updating.
 + __/cluster__ : Cluster volume to share with other instances
+    + /cluster/myclusterid.Game.ini : ark Game.ini config file which will be copied on every start
+    + /cluster/myclusterid.GameUserSetting.ini : ark GameUserSetting.ini config file which will be copied on every start
 
 ## Known issues
 Currently none
