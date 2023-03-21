@@ -50,6 +50,8 @@ fi
 [ ! -d /ark/log ] && mkdir /ark/log
 [ ! -d /ark/backup ] && mkdir /ark/backup
 [ ! -d /ark/staging ] && mkdir /ark/staging
+[ ! -d /ark/steam ] && mkdir /ark/steam
+[ ! -d /ark/.steam ] && mkdir /ark/.steam
 
 if [ -f "/usr/share/zoneinfo/${TZ}" ]; then
     log "Setting timezone to ${TZ} ..."
