@@ -106,20 +106,20 @@ volumes:
 
 ## Volumes
 + __/ark__ : Working directory :
-    + /ark/server : Server files and data.
-    + /ark/log : logs
-    + /ark/backup : backups
-    + /ark/arkmanager.cfg : config file for Ark Server Tools
-    + /ark/crontab : crontab config file
-    + /ark/server/ShooterGame/Saved/Config/LinuxServer/Game.ini : ark Game.ini config file
-    + /ark/server/ShooterGame/Saved/Config/LinuxServer/GameUserSetting.ini : ark GameUserSetting.ini config file
-    + /ark/template : Default config files
-    + /ark/template/arkmanager.cfg : default config file for Ark Server Tools
-    + /ark/template/crontab : default config file for crontab
-    + /ark/staging : default directory if you use the --downloadonly option when updating.
+    + `/ark/server` : Server files and data.
+    + `/ark/log` : logs
+    + `/ark/backup` : backups
+    + `/ark/arkmanager.cfg` : config file for Ark Server Tools
+    + `/ark/crontab` : crontab config file
+    + `/ark/server/ShooterGame/Saved/Config/LinuxServer/Game.ini` : ark Game.ini config file
+    + `/ark/server/ShooterGame/Saved/Config/LinuxServer/GameUserSetting.ini` : ark GameUserSetting.ini config file
+    + `/ark/template` : Default config files
+    + `/ark/template/arkmanager.cfg` : default config file for Ark Server Tools
+    + `/ark/template/crontab` : default config file for crontab
+    + `/ark/staging` : default directory if you use the --downloadonly option when updating.
 + __/cluster__ : Cluster volume to share with other instances
-    + /cluster/myclusterid.Game.ini : ark Game.ini config file which will be copied on every start
-    + /cluster/myclusterid.GameUserSetting.ini : ark GameUserSetting.ini config file which will be copied on every start
+    + `/cluster/myclusterid.Game.ini` : ark Game.ini config file which will be copied on every start
+    + `/cluster/myclusterid.GameUserSetting.ini` : ark GameUserSetting.ini config file which will be copied on every start
 
 ## Known issues
 Currently none
