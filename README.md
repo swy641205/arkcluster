@@ -19,7 +19,7 @@ __Don't forget to use `docker pull r15ch13/arkcluster` to get the latest version
 Fast & Easy cluster setup via docker compose:
 
 ```yaml
-version: "3.5"
+version: "3"
 
 services:
   island:
@@ -55,12 +55,12 @@ services:
       KILL_PROCESS_TIMEOUT: 300
       KILL_ALL_PROCESSES_TIMEOUT: 300
     volumes:
-      - server_island:/ark
+      - data_island:/ark
       - cluster:/cluster
     ports:
       - "15000-15003:15000-15003/udp"
 
-  island:
+  valguero:
     image: r15ch13/arkcluster:latest
     deploy:
       mode: global
@@ -93,14 +93,14 @@ services:
       KILL_PROCESS_TIMEOUT: 300
       KILL_ALL_PROCESSES_TIMEOUT: 300
     volumes:
-      - server_valguero:/ark
+      - data_valguero:/ark
       - cluster:/cluster
     ports:
       - "15010-15013:15010-15013/udp"
 
 volumes:
-  server_island:
-  server_valguero:
+  data_island:
+  data_valguero:
   cluster:
 ```
 
