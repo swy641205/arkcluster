@@ -39,7 +39,7 @@ RUN <<EOT bash # Install ark-server-tools
 EOT
 
 RUN <<EOT bash # Create required directories
-    mkdir -p /ark/{log,backup,staging,default,steam,.steam}
+    mkdir -p /workspace/{log,backup,staging,default,steam,.steam}
     mkdir -p /cluster
 EOT
 
@@ -57,12 +57,12 @@ RUN chmod +x /bin/healthcheck
 HEALTHCHECK --interval=10s --timeout=10s --start-period=10s --retries=3 CMD [ /bin/healthcheck ]
 
 # Fix permissions
-RUN chown steam:steam -R /ark /cluster /home/steam
+RUN chown steam:steam -R /workspace /cluster /home/steam
 
 USER steam
 RUN <<EOT bash # Install steamcmd
-    ln -s /ark/steam /home/steam/Steam
-    ln -s /ark/.steam /home/steam/.steam
+    ln -s /workspace/steam /home/steam/Steam
+    ln -s /workspace/.steam /home/steam/.steam
     mkdir -p ~/steamcmd && cd ~/steamcmd
     curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf -
     ./steamcmd.sh +quit
@@ -96,5 +96,5 @@ ENV CRON_AUTO_UPDATE="0 */3 * * *" \
     KILL_ALL_PROCESSES_TIMEOUT=300
 
 USER root
-VOLUME /ark /cluster
-WORKDIR /ark
+VOLUME /workspace /cluster
+WORKDIR /workspace
