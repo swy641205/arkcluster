@@ -11,37 +11,33 @@ LABEL org.opencontainers.image.authors="Richard Kuhnt <r15ch13+git@gmail.com>" \
 # Use baseimage-docker's init system.
 CMD ["/sbin/my_init"]
 
-RUN <<EOT bash # Install dependencies and clean up
-    apt-get update
-    apt-get upgrade -y -o Dpkg::Options::="--force-confold"
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends bzip2 curl lib32gcc-s1 libc6-i386 lsof perl-modules tzdata libcompress-raw-zlib-perl
-    apt-get clean
+# Install dependencies and clean up
+RUN apt-get update && \
+    apt-get upgrade -y -o Dpkg::Options::="--force-confold" && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends bzip2 curl lib32gcc-s1 libc6-i386 lsof perl-modules tzdata libcompress-raw-zlib-perl && \
+    apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-EOT
 
 ARG ARKMANAGER_VERSION=1.6.62
 
 ENV USER_ID=1000 \
     GROUP_ID=1000
 
-RUN <<EOT bash # Add steam user
-    addgroup --gid "$GROUP_ID" steam
-    adduser --system --uid "$USER_ID" --gid "$GROUP_ID" --shell /bin/bash steam
+# Add steam user
+RUN addgroup --gid "$GROUP_ID" steam && \
+    adduser --system --uid "$USER_ID" --gid "$GROUP_ID" --shell /bin/bash steam && \
     usermod -a -G docker_env steam
-EOT
 
-RUN <<EOT bash # Install ark-server-tools
-    curl -sqL "https://github.com/arkmanager/ark-server-tools/archive/refs/tags/v${ARKMANAGER_VERSION}.tar.gz" | tar zxvf -
-    pushd "./ark-server-tools-${ARKMANAGER_VERSION}/tools"
-    ./install.sh steam --bindir=/usr/bin
-    popd
-    rm -r "ark-server-tools-${ARKMANAGER_VERSION}"
-EOT
+# Install ark-server-tools
+RUN bash -c "curl -sqL 'https://github.com/arkmanager/ark-server-tools/archive/refs/tags/v${ARKMANAGER_VERSION}.tar.gz' | tar zxvf - && \
+    pushd './ark-server-tools-${ARKMANAGER_VERSION}/tools' && \
+    ./install.sh steam --bindir=/usr/bin && \
+    popd && \
+    rm -r 'ark-server-tools-${ARKMANAGER_VERSION}'"
 
-RUN <<EOT bash # Create required directories
-    mkdir -p /workspace/{log,backup,staging,default,steam,.steam}
+# Create required directories
+RUN mkdir -p /workspace/{log,backup,staging,default,steam,.steam} && \
     mkdir -p /cluster
-EOT
 
 # Setup arkcluster
 RUN mkdir -p /etc/service/arkcluster
@@ -60,13 +56,13 @@ HEALTHCHECK --interval=10s --timeout=10s --start-period=10s --retries=3 CMD [ /b
 RUN chown steam:steam -R /workspace /cluster /home/steam
 
 USER steam
-RUN <<EOT bash # Install steamcmd
-    ln -s /workspace/steam /home/steam/Steam
-    ln -s /workspace/.steam /home/steam/.steam
-    mkdir -p ~/steamcmd && cd ~/steamcmd
-    curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf -
+
+# Install steamcmd
+RUN ln -s /workspace/steam /home/steam/Steam && \
+    ln -s /workspace/.steam /home/steam/.steam && \
+    mkdir -p ~/steamcmd && cd ~/steamcmd && \
+    curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf - && \
     ./steamcmd.sh +quit
-EOT
 
 # Expose environment variables
 ENV CRON_AUTO_UPDATE="0 */3 * * *" \
@@ -75,7 +71,7 @@ ENV CRON_AUTO_UPDATE="0 */3 * * *" \
     BACKUPONSTART=1 \
     BACKUPONSTOP=1 \
     WARNONSTOP=1 \
-    TZ=UTC \
+    TZ=Asia/Taipei \
     MAX_BACKUP_SIZE=500 \
     SERVERMAP="TheIsland" \
     SESSION_NAME="ARK Docker" \
