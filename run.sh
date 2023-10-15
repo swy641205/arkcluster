@@ -1,38 +1,8 @@
 #!/usr/bin/env bash
 
-CRON_AUTO_UPDATE="0 */3 * * *"
-CRON_AUTO_BACKUP="0 */1 * * *"
-UPDATEONSTART=1
-BACKUPONSTART=1
-BACKUPONSTOP=1
-WARNONSTOP=1
-USER_ID=1000
-GROUP_ID=1000
-TZ="UTC"
-MAX_BACKUP_SIZE=500
-SERVERMAP="Valguero_P"
-SESSION_NAME="ARK Cluster TheIsland"
-MAX_PLAYERS=20
-RCON_ENABLE="True"
-QUERY_PORT=15000
-GAME_PORT=15002
-RCON_PORT=15003
-SERVER_PVE="False"
-SERVER_PASSWORD=""
-ADMIN_PASSWORD="keepmesecret"
-SPECTATOR_PASSWORD="keepmesecret"
-MODS="731604991"
-CLUSTER_ID="myclusterid"
-GAME_USERSETTINGS_INI_PATH="/cluster/myclusterid.GameUserSettings.ini"
-GAME_INI_PATH="/cluster/myclusterid.Game.ini"
-KILL_PROCESS_TIMEOUT=300
-KILL_ALL_PROCESSES_TIMEOUT=300
-
-
-#!/usr/bin/env bash
-
 # shellcheck source=/dev/null
 source /etc/container_environment.sh
+source /workspace/env.txt
 
 function log { echo "$(date +%Y-%m-%dT%H:%M:%SZ): $*"; }
 
@@ -66,6 +36,7 @@ function stop {
     rm -f /workspace/server/.stopping-server
     exit
 }
+
 
 # Change the USER_ID if needed
 if [ ! "$(id -u steam)" -eq "$USER_ID" ]; then
@@ -130,6 +101,29 @@ else
     fi
 fi
 
+
+# 自動刪除不再MOD變量裡的id
+
+# 將MODS字符串轉換為陣列
+IFS=',' read -ra MODS_ARRAY <<< "$MODS"
+
+# 遍歷/server/ShooterGame/Content/Mods目錄下的所有.mod檔案
+for mod_file in /workspace/server/ShooterGame/Content/Mods/*.mod; do
+    # 如果沒有匹配到任何文件，則跳過迴圈
+    [[ ! -e "$mod_file" ]] && continue
+
+    # 獲取檔案名（不包括路徑和副檔名）
+    mod_id=$(basename -- "$mod_file" .mod)
+    
+    # 檢查mod_id是否在MODS_ARRAY中
+    if [[ -n "$mod_id" && "$mod_id" != "111111111" && ! " ${MODS_ARRAY[@]} " =~ " ${mod_id} " ]]; then
+        log "移除模組 ${mod_id}"
+        arkmanager uninstallmod "$mod_id"
+    fi
+
+done
+
+
 log "###########################################################################"
 log "Installing Mods ..."
 if ! arkmanager checkmodupdate --revstatus; then
@@ -138,19 +132,75 @@ if ! arkmanager checkmodupdate --revstatus; then
     rm -f /workspace/server/.installing-mods
 fi
 
+
+
+function just_stop {
+    arkmanager stop
+}
+
+function command {
+    while true; do
+        read -p "輸入help取得指令說明: " -a userInputArray
+        command="${userInputArray[0]}"
+        if [ "$command" == "stop" ]; then
+            stop
+            break
+        elif [ "$command" == "reinstall" ]; then
+            arkmanager install
+        elif [ "$command" == "list-mod" ]; then
+            arkmanager list-mods
+        elif [ "$command" == "fix-mode" ]; then
+            arkmanager stop --warnreason
+        elif [ "$command" == "debug" ]; then
+            arkmanager run
+        elif [ "$command" == "uninstallmod" ]; then
+            modId="${userInputArray[1]}"  # 模組ID應該是第二個詞
+            arkmanager uninstallmod "$modId"
+        elif [ "$command" == "arkmanager" ]; then
+            arkmanager "${userInputArray[@]:1}"
+        elif [ "$command" == "help" ]; then
+            cat <<- EOM
+指令說明：
+    debug   以偵錯模式開啟伺服器（詳細訊息會顯示在終端機）
+    list-mod   列出已安裝的模組
+    uninstallmod <id>   移除模組 e.g. uninstallmod 1734595558
+    reinstall   重新安裝ark伺服器（若伺服器檔案損毀才使用，比如：缺少材質檔案…）
+
+詳細指令請參考文檔 - 偵錯模式：
+    https://ouob.net/ark
+EOM
+        else
+            log "未知指令，請參考文檔：https://ouob.net/ark"
+        fi
+    done
+}
+
+
 log "###########################################################################"
 log "Launching ark server ..."
-if [ "${UPDATEONSTART}" -eq 1 ]; then
+
+if [ "$DEBUG" == "True" ]; then
+    trap just_stop INT
+    trap just_stop TERM
+    arkmanager run
+elif [ "${UPDATEONSTART}" -eq 1 ]; then
     arkmanager start
+    trap stop INT
+    trap stop TERM
+    service cron start
 else
     arkmanager start -noautoupdate
 fi
 
+
 # Stop server in case of signal INT or TERM
 log "###########################################################################"
 log "Running ... (waiting for INT/TERM signal)"
-trap stop INT
-trap stop TERM
 
-read -r < /tmp/FIFO &
-wait
+if [ "$DEBUG" == "False" ]; then
+    trap stop INT
+    trap stop TERM
+    service cron start
+fi
+
+command
