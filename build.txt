@@ -1,1 +1,2 @@
 docker build -t m_ark .
+docker build -t m_ark:dev .
