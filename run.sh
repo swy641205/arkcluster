@@ -156,17 +156,21 @@ function command {
         elif [ "$command" == "uninstallmod" ]; then
             modId="${userInputArray[1]}"  # 模組ID應該是第二個詞
             arkmanager uninstallmod "$modId"
-        elif [ "$command" == "arkmanager" ]; then
+        elif [ "$command" == "am" ]; then
             arkmanager "${userInputArray[@]:1}"
+        elif [ "$command" == "ps" ]; then
+            ps -eo %cpu,%mem,pid,cmd --sort=-%mem | awk '{printf "%-6s %-6s %-6s %.100s\n", $1, $2, $3, $4}' | head -n 4
+        elif [ "$command" == "top" ]; then
+            top
         elif [ "$command" == "help" ]; then
             cat <<- EOM
 指令說明：
-    debug   以偵錯模式開啟伺服器（詳細訊息會顯示在終端機）
+    ps   查看記憶體佔用狀態
     list-mod   列出已安裝的模組
     uninstallmod <id>   移除模組 e.g. uninstallmod 1734595558
     reinstall   重新安裝ark伺服器（若伺服器檔案損毀才使用，比如：缺少材質檔案…）
 
-詳細指令請參考文檔 - 偵錯模式：
+詳細指令請參考文檔 - 管理指令：
     https://ouob.net/ark
 EOM
         else
